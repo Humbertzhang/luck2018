@@ -11,7 +11,7 @@ headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36"
 }
 
-proxylist = ["http://39.108.79.110:1180", "http://120.77.246.73:1180"]
+proxylist = ["http://79.110:1180", "http://246.73:1180"]
 
 #login util
 async def getjid(setcookie):
