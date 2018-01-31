@@ -6,4 +6,5 @@ chardet==3.0.4
 idna==2.6
 multidict==4.0.0
 pkg-resources==0.0.0
+PyMySQL==0.8.0
 yarl==1.1.0
