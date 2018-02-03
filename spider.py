@@ -105,5 +105,5 @@ async def login_ccnu(sid, pswd):
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(login_ccnu(2016210942, "humbert123456781"))
+    loop.run_until_complete(login_ccnu(2016, "pass"))
     loop.close()
