@@ -3,6 +3,10 @@ import asyncio
 import aiohttp
 import random
 from db import cur, select_user_viacid, insert_students
+import os
+
+PROXY1 = os.getenv("PROXY1")
+PROXY2 = os.getenv("PROXY2")
 
 accounturl = "https://account.ccnu.edu.cn/cas/login"
 account_jurl = "https://account.ccnu.edu.cn/cas/login;jsessionid="
@@ -12,7 +16,7 @@ headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36"
 }
 
-proxylist = []
+proxylist = [PROXY1, PROXY2]
 
 #login util 获得Cookie
 async def getjid(setcookie):
@@ -25,11 +29,11 @@ async def getltid(html):
     soup = BeautifulSoup(html)
 
     # 内网条件下为
-    # ltid = soup.find_all('input')[2]['value']
-    # execution = soup.find_all('input')[3]['value']
-
-    ltid = soup.find_all('input')[3]['value']
-    execution = soup.find_all('input')[4]['value']
+    ltid = soup.find_all('input')[2]['value']
+    execution = soup.find_all('input')[3]['value']
+    if len(execution) is not 4:
+        ltid = soup.find_all('input')[3]['value']
+        execution = soup.find_all('input')[4]['value']
     return ltid, execution
 
 #模拟登录Account.ccnu.edu.cn
@@ -77,7 +81,7 @@ async def getinfo(sid, _proxy):
             
             # 若还是没找到返回空
             if len(cont) is 0:
-                retunr ("", "", "")
+                return ("", "", "")
 
             # 加入到数据库中
             stu = []

@@ -1,0 +1,7 @@
+luck2018:
+    build: .
+    env_file:
+        - luck.env
+    command: gunicorn wsgi:app -k aiohttp.worker.GunicornWebWorker -b 0.0.0.0:8080 --log-level DEBUG
+    ports: 
+        - "3500:8080"
