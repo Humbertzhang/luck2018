@@ -9,3 +9,5 @@ PyMySQL==0.8.0
 yarl==1.1.0
 jsoncensor==0.0.9
 gunicorn
+requests==2.10.0
+aioredis
