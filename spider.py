@@ -6,9 +6,6 @@ from db import cur, select_user_viacid, insert_students
 import os
 import base64
 import time
-import requests
-
-import aioredis
 
 PROXY1 = os.getenv("PROXY1")
 PROXY2 = os.getenv("PROXY2")
@@ -24,22 +21,23 @@ headers = {
 }
 
 #### Proxy
-def get_proxy():
+async def get_proxy():
     ipheader = {
             "Authorization": AUTH
     }
-    item = requests.get("http://120.77.246.73:1299/api/ip/", headers = ipheader)
-    item = item.json()
-    proxy = {"http": "http://" + str(item["IP"] +":"+item["port"])}
-    print(proxy)
-    # 检查一下
-    r = requests.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", headers = headers, proxies = proxy)
-    if r.status_code == 200:
-        return proxy["http"]
-    else:
-        proxylist = [PROXY1, PROXY2]
-        _proxy = random.randint(0, len(proxylist)-1)
-        return proxylist[_proxy]
+    async with aiohttp.ClientSession(cookie_jar = aiohttp.CookieJar(unsafe=True),
+                headers = ipheader) as session:
+        async with session.get("http://120.77.246.73:1299/api/ip/") as resp:
+            item = await resp.json()
+            proxy = "http://" + str(item["IP"] +":"+item["port"])
+            # 检查一下
+            async with session.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", proxy = proxy) as r:
+                if r.status == 200:
+                    return proxy
+                else:
+                    proxylist = [PROXY1, PROXY2]
+                    _proxy = random.randint(0, len(proxylist)-1)
+                    return proxylist[_proxy]
 #### 
 
 #login util 获得Cookie
@@ -64,7 +62,7 @@ async def getltid(html):
 async def login_xxmh(sid, pswd, _proxy):
     _cookie_jar = None
     #GET PROXY
-    myproxy = get_proxy()
+    myproxy = await get_proxy()
     async with aiohttp.ClientSession(cookie_jar = aiohttp.CookieJar(unsafe=True), headers = headers) as session:
         async with session.get(accounturl, timeout = 15, proxy = myproxy) as response:
             ltid, execution = await getltid(await response.text())
@@ -85,7 +83,8 @@ async def login_xxmh(sid, pswd, _proxy):
 
 #获取学生信息
 async def getinfo(sid, _proxy):
-    myproxy = get_proxy()
+    myproxy = await get_proxy()
+
     # 先看数据库中有无
     info = select_user_viacid(sid, cur)
     if info is not None:
@@ -118,7 +117,7 @@ async def getinfo(sid, _proxy):
             return (cont[1], cont[2], cont[4])
 
 async def login_ccnu(sid, pswd):
-    _proxy = get_proxy()
+    _proxy = await get_proxy()
     status = await login_xxmh(sid, pswd, _proxy)
     if status:
         name, gender, college = await getinfo(sid, _proxy)
