@@ -11,6 +11,7 @@ PROXY1 = os.getenv("PROXY1")
 PROXY2 = os.getenv("PROXY2")
 ####
 AUTH = os.getenv("AUTH")
+PROXY = os.getenv("PROXY")
 
 accounturl = "https://account.ccnu.edu.cn/cas/login"
 account_jurl = "https://account.ccnu.edu.cn/cas/login;jsessionid="
@@ -27,7 +28,7 @@ async def get_proxy():
     }
     async with aiohttp.ClientSession(cookie_jar = aiohttp.CookieJar(unsafe=True),
                 headers = ipheader) as session:
-        async with session.get("http://120.77.246.73:1299/api/ip/") as resp:
+        async with session.get(PROXY) as resp:
             item = await resp.json()
             proxy = "http://" + str(item["IP"] +":"+item["port"])
             # 检查一下
