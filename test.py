@@ -17,7 +17,7 @@ async def test_login(sid, pswd):
             result.append(status)
 
 if __name__ == '__main__':
-    TASKNUM = 40
+    TASKNUM = 200
     loop = asyncio.get_event_loop()
     tasks = [asyncio.ensure_future(test_login(2016210942, "muxistudio")) for i in range(1, TASKNUM)]
     loop.run_until_complete(asyncio.wait(tasks))

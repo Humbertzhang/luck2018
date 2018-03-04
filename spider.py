@@ -31,14 +31,21 @@ async def get_proxy():
         async with session.get(PROXY) as resp:
             item = await resp.json()
             proxy = "http://" + str(item["IP"] +":"+item["port"])
+            
+            #可用代理
+            proxylist = [PROXY1, PROXY2]
+            _proxy = random.randint(0, len(proxylist)-1)
+
             # 检查一下
-            async with session.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", proxy = proxy) as r:
-                if r.status == 200:
-                    return proxy
-                else:
-                    proxylist = [PROXY1, PROXY2]
-                    _proxy = random.randint(0, len(proxylist)-1)
-                    return proxylist[_proxy]
+            try:
+                async with session.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", proxy = proxy, timeout = 1.5) as r:
+                    if r.status == 200:
+                        return proxy
+                    else:
+                        return proxylist[_proxy]
+            except:
+                return proxylist[_proxy]
+
 #### 
 
 #login util 获得Cookie
@@ -60,10 +67,9 @@ async def getltid(html):
     return ltid, execution
 
 #模拟登录Account.ccnu.edu.cn
-async def login_xxmh(sid, pswd, _proxy):
+async def login_xxmh(sid, pswd, myproxy):
     _cookie_jar = None
     #GET PROXY
-    myproxy = await get_proxy()
     async with aiohttp.ClientSession(cookie_jar = aiohttp.CookieJar(unsafe=True), headers = headers) as session:
         async with session.get(accounturl, timeout = 15, proxy = myproxy) as response:
             ltid, execution = await getltid(await response.text())
@@ -83,9 +89,7 @@ async def login_xxmh(sid, pswd, _proxy):
                     return False
 
 #获取学生信息
-async def getinfo(sid, _proxy):
-    myproxy = await get_proxy()
-
+async def getinfo(sid, myproxy):
     # 先看数据库中有无
     info = select_user_viacid(sid, cur)
     if info is not None:
@@ -118,10 +122,13 @@ async def getinfo(sid, _proxy):
             return (cont[1], cont[2], cont[4])
 
 async def login_ccnu(sid, pswd):
-    _proxy = await get_proxy()
-    status = await login_xxmh(sid, pswd, _proxy)
+    myproxy = await get_proxy()
+    
+    print("Log:" + str(myproxy) + "\n")
+
+    status = await login_xxmh(sid, pswd, myproxy)
     if status:
-        name, gender, college = await getinfo(sid, _proxy)
+        name, gender, college = await getinfo(sid, myproxy)
         return {
             "name":name,
             "gender": gender,
