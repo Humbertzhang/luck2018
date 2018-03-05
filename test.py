@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 
-loginurl = "http://0.0.0.0:3500/api/loginccnu/"
+loginurl = "http://luck.muxixyz.com/api/loginccnu/"
 
 result = []
 
@@ -17,7 +17,7 @@ async def test_login(sid, pswd):
             result.append(status)
 
 if __name__ == '__main__':
-    TASKNUM = 200
+    TASKNUM = 150
     loop = asyncio.get_event_loop()
     tasks = [asyncio.ensure_future(test_login(2016210942, "muxistudio")) for i in range(1, TASKNUM)]
     loop.run_until_complete(asyncio.wait(tasks))

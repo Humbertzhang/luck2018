@@ -9,10 +9,9 @@ import time
 
 PROXY1 = os.getenv("PROXY1")
 PROXY2 = os.getenv("PROXY2")
-####
-AUTH = os.getenv("AUTH")
-PROXY = os.getenv("PROXY")
+PROXY3 = os.getenv("PROXY3")
 
+####
 accounturl = "https://account.ccnu.edu.cn/cas/login"
 account_jurl = "https://account.ccnu.edu.cn/cas/login;jsessionid="
 info_url = "http://xpcx.ccnu.edu.cn/page.php?cid="
@@ -23,6 +22,7 @@ headers = {
 
 #### Proxy
 async def get_proxy():
+    '''
     ipheader = {
             "Authorization": AUTH
     }
@@ -38,14 +38,17 @@ async def get_proxy():
 
             # 检查一下
             try:
-                async with session.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", proxy = proxy, timeout = 1.5) as r:
+                async with session.get("https://account.ccnu.edu.cn/cas/css/addstyle.css", proxy = proxy, timeout = 1.2) as r:
                     if r.status == 200:
                         return proxy
                     else:
                         return proxylist[_proxy]
             except:
                 return proxylist[_proxy]
-
+    '''
+    proxylist = [PROXY1, PROXY2]
+    _proxy = random.randint(0, len(proxylist)-1)
+    return proxylist[_proxy]
 #### 
 
 #login util 获得Cookie
